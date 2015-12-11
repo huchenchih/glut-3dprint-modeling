@@ -207,7 +207,7 @@
 1225077308 g:\lab4+5\shared\glframe.h
 	"math3d.h"
 
-1448604076 source:g:\glut stl loader\glut stl loader\glut_stl_loader.cpp
+1448597908 source:g:\glut stl loader\glut stl loader\glut_stl_loader.cpp
 	"../shared/gltools.h"
 	"../shared/math3d.h"
 	"../shared/glframe.h"
@@ -244,7 +244,7 @@
 1225077308 g:\glut stl loader\shared\glframe.h
 	"math3d.h"
 
-1448604076 source:i:\glut stl loader\glut stl loader\glut_stl_loader.cpp
+1448554026 source:i:\glut stl loader\glut stl loader\glut_stl_loader.cpp
 	"../shared/gltools.h"
 	"../shared/math3d.h"
 	"../shared/glframe.h"
@@ -316,5 +316,42 @@
 	<memory.h>
 
 1225077308 f:\glut stl loader\shared\glframe.h
+	"math3d.h"
+
+1449714783 source:c:\users\user\desktop\glut stl loader\glut stl loader\glut_stl_loader.cpp
+	"../shared/gltools.h"
+	"../shared/math3d.h"
+	"../shared/glframe.h"
+	<iostream>
+	<fstream>
+	<math.h>
+	<string>
+
+1317648090 c:\users\user\desktop\glut stl loader\shared\gltools.h
+	<windows.h>
+	"glee.h"
+	<gl\gl.h>
+	<gl\glu.h>
+	<gl\glut.h>
+	<Carbon/Carbon.h>
+	"glee.h"
+	<OpenGL/gl.h>
+	<OpenGL/glu.h>
+	<Glut/glut.h>
+	<math.h>
+
+1225077308 c:\users\user\desktop\glut stl loader\shared\glee.h
+	<windows.h>
+	<GL/gl.h>
+	<OpenGL/gl.h>
+	<GL/gl.h>
+	<GL/glx.h>
+	<stddef.h>
+
+1225077826 c:\users\user\desktop\glut stl loader\shared\math3d.h
+	<math.h>
+	<memory.h>
+
+1225077308 c:\users\user\desktop\glut stl loader\shared\glframe.h
 	"math3d.h"
 

@@ -34,14 +34,12 @@ struct point
 };
 struct vec
 {
-    point p1;
-    point p2;
-    point p3;
+    point pp[3];
 };
 
 vec p[500000];
-
-
+bool state = 0;
+double voxsize = 0.1;
 void read_binary_stl(string fname)
 {
     cout <<"This is binary stl file !" << endl;
@@ -106,17 +104,17 @@ void read_binary_stl(string fname)
 
             char fz3[4] = {facet[44],facet[45],facet[46],facet[47]};
 
-            p[i].p1.px = *((float*) fx1 );
-            p[i].p1.py = *((float*) fy1 );
-            p[i].p1.pz = *((float*) fz1 );
+            p[i].pp[0].px = *((float*) fx1 );
+            p[i].pp[0].py = *((float*) fy1 );
+            p[i].pp[0].pz = *((float*) fz1 );
 
-            p[i].p2.px = *((float*) fx2 );
-            p[i].p2.py = *((float*) fy2 );
-            p[i].p2.pz = *((float*) fz2 );
+            p[i].pp[1].px = *((float*) fx2 );
+            p[i].pp[1].py = *((float*) fy2 );
+            p[i].pp[1].pz = *((float*) fz2 );
 
-            p[i].p3.px = *((float*) fx3 );
-            p[i].p3.py = *((float*) fy3 );
-            p[i].p3.pz = *((float*) fz3 );
+            p[i].pp[2].px = *((float*) fx3 );
+            p[i].pp[2].py = *((float*) fy3 );
+            p[i].pp[2].pz = *((float*) fz3 );
 
         }
     }
@@ -176,20 +174,20 @@ void read_ascii_stl(string fname)
                     {
                         if(vn==0)
                         {
-                            p[fn].p1.px = f;
+                            // p[fn].p1.px = f;
                             vn++;
                         }
                         else if(vn==1)
                         {
-                            p[fn].p1.py = f;
+                            //p[fn].p1.py = f;
                             vn++;
                         }
                         else if(vn==2)
                         {
-                            p[fn].p1.pz = f;
+                            //p[fn].p1.pz = f;
                             vn=0;
                             vv++;
-                            cout << p[fn].p1.px << " , " << p[fn].p1.py << " , " << p[fn].p1.pz << endl;
+                            //cout << p[fn].p1.px << " , " << p[fn].p1.py << " , " << p[fn].p1.pz << endl;
 
                         }
                     }
@@ -197,41 +195,41 @@ void read_ascii_stl(string fname)
                     {
                         if(vn==0)
                         {
-                            p[fn].p2.px = f;
+                            //p[fn].p2.px = f;
                             vn++;
                         }
                         else if(vn==1)
                         {
-                            p[fn].p2.py = f;
+                            //p[fn].p2.py = f;
                             vn++;
                         }
                         else if(vn==2)
                         {
-                            p[fn].p2.pz = f;
+                            //p[fn].p2.pz = f;
                             vn=0;
                             vv++;
-                            cout << p[fn].p2.px << " , " << p[fn].p2.py << " , " << p[fn].p2.pz << endl;
+                            //cout << p[fn].p2.px << " , " << p[fn].p2.py << " , " << p[fn].p2.pz << endl;
                         }
                     }
                     else if(vv==2)
                     {
                         if(vn==0)
                         {
-                            p[fn].p3.px = f;
+                            //p[fn].p3.px = f;
                             vn++;
                         }
                         else if(vn==1)
                         {
-                            p[fn].p3.py = f;
+                            //p[fn].p3.py = f;
                             vn++;
                         }
                         else if(vn==2)
                         {
-                            p[fn].p3.pz = f;
+                            //p[fn].p3.pz = f;
                             vn=0;
                             vv=0;
-                            cout << p[fn].p3.px << " , " << p[fn].p3.py << " , " << p[fn].p3.pz << endl;
-                            cout << fn << endl;
+                            //cout << p[fn].p3.px << " , " << p[fn].p3.py << " , " << p[fn].p3.pz << endl;
+                            //cout << fn << endl;
                         }
                     }
 
@@ -244,52 +242,242 @@ void read_ascii_stl(string fname)
 
 
 }
+void drawvoxel(point p1,double vsize)
+{
+    glBegin(GL_QUADS);        // Draw The Cube Using quads
+            glColor3f(0.0f,0.0f,1.0f);    // Color Blue
+            glVertex3f(p1.px+vsize,p1.py+vsize,p1.pz-vsize);    // Top Right Of The Quad (Top)
+            glVertex3f(p1.px-vsize,p1.py+vsize,p1.pz-vsize);    // Top Left Of The Quad (Top)
+            glVertex3f(p1.px-vsize,p1.py+vsize,p1.pz+vsize);    // Bottom Left Of The Quad (Top)
+            glVertex3f(p1.px+vsize,p1.py+vsize,p1.pz+vsize);    // Bottom Right Of The Quad (Top)
+            //glColor3f(1.0f,0.5f,0.0f);    // Color Orange
+            glVertex3f(p1.px+vsize,p1.py-vsize,p1.pz+vsize);    // Top Right Of The Quad (Bottom)
+            glVertex3f(p1.px-vsize,p1.py-vsize,p1.pz+vsize);    // Top Left Of The Quad (Bottom)
+            glVertex3f(p1.px-vsize,p1.py-vsize,p1.pz-vsize);    // Bottom Left Of The Quad (Bottom)
+            glVertex3f(p1.px+vsize,p1.py-vsize,p1.pz-vsize);    // Bottom Right Of The Quad (Bottom)
+            //glColor3f(1.0f,0.0f,0.0f);    // Color Red
+            glVertex3f(p1.px+vsize,p1.py+vsize,p1.pz+vsize);    // Top Right Of The Quad (Front)
+            glVertex3f(p1.px-vsize,p1.py+vsize,p1.pz+vsize);    // Top Left Of The Quad (Front)
+            glVertex3f(p1.px-vsize,p1.py-vsize,p1.pz+vsize);    // Bottom Left Of The Quad (Front)
+            glVertex3f(p1.px+vsize,p1.py-vsize,p1.pz+vsize);    // Bottom Right Of The Quad (Front)
+            //glColor3f(1.0f,1.0f,0.0f);    // Color Yellow
+            glVertex3f(p1.px+vsize,p1.py-vsize,p1.pz-vsize);    // Top Right Of The Quad (Back)
+            glVertex3f(p1.px-vsize,p1.py-vsize,p1.pz-vsize);    // Top Left Of The Quad (Back)
+            glVertex3f(p1.px-vsize,p1.py+vsize,p1.pz-vsize);    // Bottom Left Of The Quad (Back)
+            glVertex3f(p1.px+vsize,p1.py+vsize,p1.pz-vsize);    // Bottom Right Of The Quad (Back)
+            //glColor3f(0.0f,0.0f,1.0f);    // Color Blue
+            glVertex3f(p1.px-vsize,p1.py+vsize,p1.pz+vsize);    // Top Right Of The Quad (Left)
+            glVertex3f(p1.px-vsize,p1.py+vsize,p1.pz-vsize);    // Top Left Of The Quad (Left)
+            glVertex3f(p1.px-vsize,p1.py-vsize,p1.pz-vsize);    // Bottom Left Of The Quad (Left)
+            glVertex3f(p1.px-vsize,p1.py-vsize,p1.pz+vsize);    // Bottom Right Of The Quad (Left)
+            //glColor3f(1.0f,0.0f,1.0f);    // Color Violet
+            glVertex3f(p1.px+vsize,p1.py+vsize,p1.pz-vsize);    // Top Right Of The Quad (Right)
+            glVertex3f(p1.px+vsize,p1.py+vsize,p1.pz+vsize);    // Top Left Of The Quad (Right)
+            glVertex3f(p1.px+vsize,p1.py-vsize,p1.pz+vsize);    // Bottom Left Of The Quad (Right)
+            glVertex3f(p1.px+vsize,p1.py-vsize,p1.pz-vsize);    // Bottom Right Of The Quad (Right)
+            glEnd();            // End Drawing The Cube - See more at: http://www.codemiles.com/c-opengl-examples/draw-3d-cube-using-opengl-t9018.html#sthash.FDVsWoyj.dpuf
 
+}
+void Bresenham(int x0,int y0,int z0,int x1,int y1,int z1)
+{
+    if((z1-z0)==0)
+    {
+        bool steep = abs(y1-y0) > abs(x1-x0);
+        if(steep)
+        {
+            swap(x0,y0);
+            swap(x1,y1);
+        }
+        if(x0>x1)
+        {
+            swap(x0,x1);
+            swap(y0,y1);
+        }
+        int deltax = x1-x0;
+        int deltay = abs(y1-y0);
+        float error = 0;
+        float deltaerr = deltay/deltax;
+        int ystep;
+        int y = y0;
+        if(y0<y1)ystep = 1;
+        else ystep = -1;
+        point temp;
+        temp.pz = z0;
+        for(int i=x0; i<=x1; i++)
+        {
+            if(steep)
+            {
+                temp.px = y;
+                temp.py = i;
+            }
+            else
+            {
+                temp.px = i;
+                temp.py = y;
+            }
+            error += deltaerr;
+            if(error >= 0.5)
+            {
+                y += ystep;
+                error -= 1.0;
+            }
+            drawvoxel(temp,0.5);
+        }
+    }
+    else if((x1-x0)==0)
+    {
+        bool steep = abs(z1-z0) > abs(y1-y0);
+        if(steep)
+        {
+            swap(y0,z0);
+            swap(y1,z1);
+        }
+        if(y0>y1)
+        {
+            swap(y0,y1);
+            swap(z0,z1);
+        }
+        int deltay = y1-y0;
+        int deltaz = abs(z1-z0);
+        float error = 0;
+        float deltaerr = deltaz/deltay;
+        int zstep;
+        int z = z0;
+        if(z0<z1)zstep = 1;
+        else zstep = -1;
+        point temp;
+        temp.px = x0;
+        for(int i=y0; i<=y1; i++)
+        {
+            if(steep)
+            {
+                temp.py = z;
+                temp.pz = i;
+            }
+            else
+            {
+                temp.py = i;
+                temp.pz = z;
+            }
+            error += deltaerr;
+            if(error >= 0.5)
+            {
+                z += zstep;
+                error -= 1.0;
+            }
+            drawvoxel(temp,0.5);
+        }
+    }
+    /*else if((y1-y0)==0)
+    {
+        bool steep = abs(z1-z0) > abs(x1-x0);
+        if(steep)
+        {
+            swap(x0,z0);
+            swap(x1,z1);
+        }
+        if(x0>x1)
+        {
+            swap(x0,x1);
+            swap(z0,z1);
+        }
+        int deltax = x1-x0;
+        int deltaz = abs(z1-z0);
+        float error = 0;
+        float deltaerr = deltaz/deltax;
+        int zstep;
+        int z = z0;
+        if(z0<z1)zstep = 1;
+        else zstep = -1;
+        point temp;
+        temp.py = y0;
+        for(int i=x0; i<=x1; i++)
+        {
+            if(steep)
+            {
+                temp.px = z;
+                temp.pz = i;
+            }
+            else
+            {
+                temp.px = i;
+                temp.pz = z;
+            }
+            error += deltaerr;
+            if(error >= 0.5)
+            {
+                z += zstep;
+                error -= 1.0;
+            }
+            drawvoxel(temp,0.5);
+        }
+    }*/
+}
+void voxelize(void)
+{
+    for(int i = 0; i < int(nTriLong); i++)
+    {
+
+        point v21,v31,v32;
+        v21.px = p[i].pp[1].px-p[i].pp[0].px;
+        v21.py = p[i].pp[1].py-p[i].pp[0].py;
+        v21.pz = p[i].pp[1].pz-p[i].pp[0].pz;
+
+        v31.px = p[i].pp[2].px-p[i].pp[0].px;
+        v31.py = p[i].pp[2].py-p[i].pp[0].py;
+        v31.pz = p[i].pp[2].pz-p[i].pp[0].pz;
+
+        v32.px = p[i].pp[2].px-p[i].pp[1].px;
+        v32.py = p[i].pp[2].py-p[i].pp[1].py;
+        v32.pz = p[i].pp[2].pz-p[i].pp[1].pz;
+
+
+        for(int j=0; j<3; j++)
+        {
+            if(j==2)Bresenham(p[i].pp[j].px,p[i].pp[j].py,p[i].pp[j].pz,p[i].pp[0].px,p[i].pp[0].py,p[i].pp[0].pz);
+            else Bresenham(p[i].pp[j].px,p[i].pp[j].py,p[i].pp[j].pz,p[i].pp[j+1].px,p[i].pp[j+1].py,p[i].pp[j+1].pz);
+        }
+
+        /*cout << v21.px << "," << v21.py << "," << v21.pz << endl;
+        cout << v31.px << "," << v31.py << "," << v31.pz << endl;
+        cout << v32.px << "," << v32.py << "," << v32.pz << endl;*/
+    }
+
+
+
+
+
+    /*for(int i = 0; i < int(nTriLong); i++)
+    {
+        for(int j = 0; j < 3; j++)
+        {
+            drawvoxel(p[i].pp[j],voxsize);
+        }
+    }*/
+}
 void DrawModel()
 {
-    /*for(int i = 0; i < fn; i++)
-        {
-
-           cout << p[i].p1.px << " , " << p[i].p1.py << " , " <<  p[i].p1.pz << endl;
-           cout << p[i].p2.px << " , " << p[i].p2.py << " , " <<  p[i].p2.pz << endl;
-           cout << p[i].p3.px << " , " << p[i].p3.py << " , " <<  p[i].p3.pz << endl;
-
-        }*/
-    if(!fn)
+    glPushMatrix();
+    glTranslatef(0.0f, -0.5f, 0.0f);
+    glRotatef(-90, 1.0f, 0.0f, 0.0f);
+    glScaled (0.01, 0.01, 0.01);
+    if(!state)
     {
-        glPushMatrix();
-        glTranslatef(0.0f, -0.5f, 0.0f);
-        glRotatef(-90, 1.0f, 0.0f, 0.0f);
-        glScaled (0.01, 0.01, 0.01);
+
         for(int i = 0; i < int(nTriLong); i++)
         {
             glBegin(GL_TRIANGLES);
-
-            glVertex3f(p[i].p1.px, p[i].p1.py, p[i].p1.pz);
-            glVertex3f(p[i].p2.px, p[i].p2.py, p[i].p2.pz);
-            glVertex3f(p[i].p3.px, p[i].p3.py, p[i].p3.pz);
-
+            for(int j = 0; j < 3; j++)
+                        glVertex3f(p[i].pp[j].px, p[i].pp[j].py, p[i].pp[j].pz);
             glEnd();
         }
-        glPopMatrix();
+
     }
     else
     {
-
-        glTranslatef(0.0f, -0.5f, 0.0f);
-        glRotatef(-90, 1.0f, 0.0f, 0.0f);
-        //glScaled (0.01, 0.01, 0.01);
-        for(int i = 1; i < fn+1; i++)
-        {
-            glBegin(GL_TRIANGLES);
-
-            glVertex3f(p[i].p1.px, p[i].p1.py, p[i].p1.pz);
-            glVertex3f(p[i].p2.px, p[i].p2.py, p[i].p2.pz);
-            glVertex3f(p[i].p3.px, p[i].p3.py, p[i].p3.pz);
-
-            glEnd();
-        }
+        voxelize();
     }
+    glPopMatrix();
 }
 //////////////////////////////////////////////////////////////////
 // This function does any needed initialization on the rendering
@@ -375,7 +563,7 @@ void DrawInhabitants(GLint nShadow)
 
 
     if(nShadow == 0)
-        yRot += 0.5f;
+        yRot += 0.05f;
     else
         glColor3f(0.0f, 0.0f, 0.0f);
 
@@ -389,7 +577,7 @@ void DrawInhabitants(GLint nShadow)
         glMaterialfv(GL_FRONT, GL_SPECULAR, fBrightLight);
     }
 
-    glRotatef(yRot, 0.0f, 1.0f, 0.0f);
+    //glRotatef(yRot, 0.0f, 1.0f, 0.0f);
     DrawModel();
 
     glMaterialfv(GL_FRONT, GL_SPECULAR, fNoLight);
@@ -456,7 +644,13 @@ void SpecialKeys(int key, int x, int y)
 void KeyboardFunc(unsigned char key, int x, int y)
 {
     if(key == 'q')exit(0);
-
+    if(key == 'z')
+    {
+        if(state)state = 0;
+        else state = 1;
+    }
+    if(key == 'a')voxsize+=0.1;
+    if(key == 's')voxsize-=0.1;
     // Refresh the Window
     glutPostRedisplay();
 }
@@ -505,7 +699,7 @@ int main(int argc, char* argv[])
     glutDisplayFunc(RenderScene);
     glutSpecialFunc(SpecialKeys);
     glutKeyboardFunc(KeyboardFunc);
-    read_binary_stl("b2.stl");
+    read_binary_stl("b0.stl");
     //read_ascii_stl("a0.stl");
     SetupRC();
     glutTimerFunc(33, TimerFunction, 1);
