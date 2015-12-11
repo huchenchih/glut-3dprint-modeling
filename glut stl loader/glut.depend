@@ -1,0 +1,320 @@
+# depslib dependency file v1.0
+1225077308 source:c:\users\user\desktop\lab4+5\shared\glee.c
+	<stdio.h>
+	<stdlib.h>
+	<string.h>
+	"GLee.h"
+	<Carbon/Carbon.h>
+
+1225077308 c:\users\user\desktop\lab4+5\shared\glee.h
+	<windows.h>
+	<GL/gl.h>
+	<OpenGL/gl.h>
+	<GL/gl.h>
+	<GL/glx.h>
+	<stddef.h>
+
+1287371936 source:c:\users\user\desktop\lab4+5\shared\gltools.cpp
+	"gltools.h"
+	"math3d.h"
+	<stdio.h>
+	<assert.h>
+	"wglext.h"
+
+1317648090 c:\users\user\desktop\lab4+5\shared\gltools.h
+	<windows.h>
+	"glee.h"
+	<gl\gl.h>
+	<gl\glu.h>
+	<gl\glut.h>
+	<Carbon/Carbon.h>
+	"glee.h"
+	<OpenGL/gl.h>
+	<OpenGL/glu.h>
+	<Glut/glut.h>
+	<math.h>
+
+1225077826 c:\users\user\desktop\lab4+5\shared\math3d.h
+	<math.h>
+	<memory.h>
+
+1225077310 c:\users\user\desktop\lab4+5\shared\wglext.h
+	<windows.h>
+
+1225077310 source:c:\users\user\desktop\lab4+5\shared\math3d.cpp
+	<math.h>
+	"math3d.h"
+
+1448433588 source:c:\users\user\desktop\lab4+5\chapt05\sphereworld\sphereworld.cpp
+	"../../shared/gltools.h"
+	"../../shared/math3d.h"
+	"../../shared/glframe.h"
+	<math.h>
+
+1225077308 c:\users\user\desktop\lab4+5\shared\glframe.h
+	"math3d.h"
+
+1225077308 source:i:\lab4+5\shared\glee.c
+	<stdio.h>
+	<stdlib.h>
+	<string.h>
+	"GLee.h"
+	<Carbon/Carbon.h>
+
+1225077308 i:\lab4+5\shared\glee.h
+	<windows.h>
+	<GL/gl.h>
+	<OpenGL/gl.h>
+	<GL/gl.h>
+	<GL/glx.h>
+	<stddef.h>
+
+1287371936 source:i:\lab4+5\shared\gltools.cpp
+	"gltools.h"
+	"math3d.h"
+	<stdio.h>
+	<assert.h>
+	"wglext.h"
+
+1317648090 i:\lab4+5\shared\gltools.h
+	<windows.h>
+	"glee.h"
+	<gl\gl.h>
+	<gl\glu.h>
+	<gl\glut.h>
+	<Carbon/Carbon.h>
+	"glee.h"
+	<OpenGL/gl.h>
+	<OpenGL/glu.h>
+	<Glut/glut.h>
+	<math.h>
+
+1225077826 i:\lab4+5\shared\math3d.h
+	<math.h>
+	<memory.h>
+
+1225077310 i:\lab4+5\shared\wglext.h
+	<windows.h>
+
+1225077310 source:i:\lab4+5\shared\math3d.cpp
+	<math.h>
+	"math3d.h"
+
+1448473406 source:i:\lab4+5\chapt05\sphereworld\sphereworld.cpp
+	"../../shared/gltools.h"
+	"../../shared/math3d.h"
+	"../../shared/glframe.h"
+	<iostream>
+	<fstream>
+	<math.h>
+	<string>
+
+1225077308 i:\lab4+5\shared\glframe.h
+	"math3d.h"
+
+1225077308 source:e:\lab4+5\shared\glee.c
+	<stdio.h>
+	<stdlib.h>
+	<string.h>
+	"GLee.h"
+	<Carbon/Carbon.h>
+
+1225077308 e:\lab4+5\shared\glee.h
+	<windows.h>
+	<GL/gl.h>
+	<OpenGL/gl.h>
+	<GL/gl.h>
+	<GL/glx.h>
+	<stddef.h>
+
+1287371936 source:e:\lab4+5\shared\gltools.cpp
+	"gltools.h"
+	"math3d.h"
+	<stdio.h>
+	<assert.h>
+	"wglext.h"
+
+1317648090 e:\lab4+5\shared\gltools.h
+	<windows.h>
+	"glee.h"
+	<gl\gl.h>
+	<gl\glu.h>
+	<gl\glut.h>
+	<Carbon/Carbon.h>
+	"glee.h"
+	<OpenGL/gl.h>
+	<OpenGL/glu.h>
+	<Glut/glut.h>
+	<math.h>
+
+1225077826 e:\lab4+5\shared\math3d.h
+	<math.h>
+	<memory.h>
+
+1225077310 e:\lab4+5\shared\wglext.h
+	<windows.h>
+
+1225077310 source:e:\lab4+5\shared\math3d.cpp
+	<math.h>
+	"math3d.h"
+
+1448510844 source:e:\lab4+5\chapt05\sphereworld\sphereworld.cpp
+	"../../shared/gltools.h"
+	"../../shared/math3d.h"
+	"../../shared/glframe.h"
+	<iostream>
+	<fstream>
+	<math.h>
+	<string>
+
+1225077308 e:\lab4+5\shared\glframe.h
+	"math3d.h"
+
+1448512274 source:g:\lab4+5\sphereworld\sphereworld.cpp
+	"../shared/gltools.h"
+	"../shared/math3d.h"
+	"../shared/glframe.h"
+	<iostream>
+	<fstream>
+	<math.h>
+	<string>
+
+1317648090 g:\lab4+5\shared\gltools.h
+	<windows.h>
+	"glee.h"
+	<gl\gl.h>
+	<gl\glu.h>
+	<gl\glut.h>
+	<Carbon/Carbon.h>
+	"glee.h"
+	<OpenGL/gl.h>
+	<OpenGL/glu.h>
+	<Glut/glut.h>
+	<math.h>
+
+1225077308 g:\lab4+5\shared\glee.h
+	<windows.h>
+	<GL/gl.h>
+	<OpenGL/gl.h>
+	<GL/gl.h>
+	<GL/glx.h>
+	<stddef.h>
+
+1225077826 g:\lab4+5\shared\math3d.h
+	<math.h>
+	<memory.h>
+
+1225077308 g:\lab4+5\shared\glframe.h
+	"math3d.h"
+
+1448604076 source:g:\glut stl loader\glut stl loader\glut_stl_loader.cpp
+	"../shared/gltools.h"
+	"../shared/math3d.h"
+	"../shared/glframe.h"
+	<iostream>
+	<fstream>
+	<math.h>
+	<string>
+
+1317648090 g:\glut stl loader\shared\gltools.h
+	<windows.h>
+	"glee.h"
+	<gl\gl.h>
+	<gl\glu.h>
+	<gl\glut.h>
+	<Carbon/Carbon.h>
+	"glee.h"
+	<OpenGL/gl.h>
+	<OpenGL/glu.h>
+	<Glut/glut.h>
+	<math.h>
+
+1225077308 g:\glut stl loader\shared\glee.h
+	<windows.h>
+	<GL/gl.h>
+	<OpenGL/gl.h>
+	<GL/gl.h>
+	<GL/glx.h>
+	<stddef.h>
+
+1225077826 g:\glut stl loader\shared\math3d.h
+	<math.h>
+	<memory.h>
+
+1225077308 g:\glut stl loader\shared\glframe.h
+	"math3d.h"
+
+1448604076 source:i:\glut stl loader\glut stl loader\glut_stl_loader.cpp
+	"../shared/gltools.h"
+	"../shared/math3d.h"
+	"../shared/glframe.h"
+	<iostream>
+	<fstream>
+	<math.h>
+	<string>
+
+1317648090 i:\glut stl loader\shared\gltools.h
+	<windows.h>
+	"glee.h"
+	<gl\gl.h>
+	<gl\glu.h>
+	<gl\glut.h>
+	<Carbon/Carbon.h>
+	"glee.h"
+	<OpenGL/gl.h>
+	<OpenGL/glu.h>
+	<Glut/glut.h>
+	<math.h>
+
+1225077308 i:\glut stl loader\shared\glee.h
+	<windows.h>
+	<GL/gl.h>
+	<OpenGL/gl.h>
+	<GL/gl.h>
+	<GL/glx.h>
+	<stddef.h>
+
+1225077826 i:\glut stl loader\shared\math3d.h
+	<math.h>
+	<memory.h>
+
+1225077308 i:\glut stl loader\shared\glframe.h
+	"math3d.h"
+
+1448604076 source:f:\glut stl loader\glut stl loader\glut_stl_loader.cpp
+	"../shared/gltools.h"
+	"../shared/math3d.h"
+	"../shared/glframe.h"
+	<iostream>
+	<fstream>
+	<math.h>
+	<string>
+
+1317648090 f:\glut stl loader\shared\gltools.h
+	<windows.h>
+	"glee.h"
+	<gl\gl.h>
+	<gl\glu.h>
+	<gl\glut.h>
+	<Carbon/Carbon.h>
+	"glee.h"
+	<OpenGL/gl.h>
+	<OpenGL/glu.h>
+	<Glut/glut.h>
+	<math.h>
+
+1225077308 f:\glut stl loader\shared\glee.h
+	<windows.h>
+	<GL/gl.h>
+	<OpenGL/gl.h>
+	<GL/gl.h>
+	<GL/glx.h>
+	<stddef.h>
+
+1225077826 f:\glut stl loader\shared\math3d.h
+	<math.h>
+	<memory.h>
+
+1225077308 f:\glut stl loader\shared\glframe.h
+	"math3d.h"
+
