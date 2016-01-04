@@ -455,6 +455,88 @@ void voxelize(void)
         }
     }*/
 }
+point cenPoint(vec p[])
+{
+    point avg,cenP;
+    cenP.px = 0;
+    cenP.py = 0;
+    cenP.pz = 0;
+    for(int i = 0; i < int(nTriLong); i++)
+    {
+        avg.px = 0;
+        avg.py = 0;
+        avg.pz = 0;
+        for(int j = 0; j < 3; j++)
+        {
+            avg.px += p[i].pp[j].px;
+            avg.py += p[i].pp[j].py;
+            avg.pz += p[i].pp[j].pz;
+        }
+        cenP.px += avg.px/3;
+        cenP.py += avg.py/3;
+        cenP.pz += avg.pz/3;
+    }
+    cenP.px /= int(nTriLong);
+    cenP.py /= int(nTriLong);
+    cenP.pz /= int(nTriLong);
+    return cenP;
+}
+
+float minZ(vec p[])
+{
+    float minZ = 100;
+    for(int i = 0; i < int(nTriLong); i++)
+    {
+        for(int j = 0; j < 3; j++)
+        {
+            if(p[i].pp[j].pz < minZ)minZ = p[i].pp[j].pz;
+        }
+    }
+    return minZ;
+}
+point firstcenP(vec p[])
+{
+    int count = 0;
+    point fcp;
+    fcp.px = 0;
+    fcp.py = 0;
+    fcp.pz = 0;
+    for(int i = 0; i < int(nTriLong); i++)
+    {
+        for(int j = 0; j < 3; j++)
+        {
+            if(p[i].pp[j].pz == minZ(p))
+            {
+                fcp.px += p[i].pp[j].px;
+                fcp.py += p[i].pp[j].py;
+                count++;
+            }
+        }
+    }
+    fcp.px /= count;
+    fcp.py /= count;
+    fcp.pz = minZ(p);
+    cout << count << endl;
+    return fcp;
+}
+void drawCenPoint(point pc)
+{
+
+    glPushMatrix();
+    glColor3f(1,0,0);
+    GLUquadric *quad = gluNewQuadric();
+    glTranslatef(pc.px,pc.py,minZ(p));
+    gluSphere(quad,1,100,20);
+    glPopMatrix();
+
+    glPushMatrix();
+    glColor3f(1,1,0);
+    GLUquadric *quad1 = gluNewQuadric();
+    glTranslatef(firstcenP(p).px,firstcenP(p).py,firstcenP(p).pz);
+    gluSphere(quad1,1,100,20);
+    glPopMatrix();
+
+}
 void DrawModel()
 {
     glPushMatrix();
@@ -468,14 +550,31 @@ void DrawModel()
         {
             glBegin(GL_TRIANGLES);
             for(int j = 0; j < 3; j++)
-                        glVertex3f(p[i].pp[j].px, p[i].pp[j].py, p[i].pp[j].pz);
+                glVertex3f(p[i].pp[j].px, p[i].pp[j].py, p[i].pp[j].pz);
             glEnd();
         }
 
     }
     else
     {
-        voxelize();
+        //voxelize();
+        for(int i = 0; i < int(nTriLong); i++)
+        {
+            glBegin(GL_LINES);
+            glVertex3f(p[i].pp[0].px, p[i].pp[0].py, p[i].pp[0].pz);
+            glVertex3f(p[i].pp[1].px, p[i].pp[1].py, p[i].pp[1].pz);
+            glEnd();
+            glBegin(GL_LINES);
+            glVertex3f(p[i].pp[1].px, p[i].pp[1].py, p[i].pp[1].pz);
+            glVertex3f(p[i].pp[2].px, p[i].pp[2].py, p[i].pp[2].pz);
+            glEnd();
+            glBegin(GL_LINES);
+            glVertex3f(p[i].pp[0].px, p[i].pp[0].py, p[i].pp[0].pz);
+            glVertex3f(p[i].pp[2].px, p[i].pp[2].py, p[i].pp[2].pz);
+            glEnd();
+        }
+        drawCenPoint(cenPoint(p));
+
     }
     glPopMatrix();
 }
@@ -699,7 +798,7 @@ int main(int argc, char* argv[])
     glutDisplayFunc(RenderScene);
     glutSpecialFunc(SpecialKeys);
     glutKeyboardFunc(KeyboardFunc);
-    read_binary_stl("b0.stl");
+    read_binary_stl("b1.stl");
     //read_ascii_stl("a0.stl");
     SetupRC();
     glutTimerFunc(33, TimerFunction, 1);
