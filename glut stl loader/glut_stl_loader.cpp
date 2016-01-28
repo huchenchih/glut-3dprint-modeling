@@ -35,11 +35,66 @@ struct point
 struct vec
 {
     point pp[3];
+    float volume;
+    float a;
+    float b;
+    float c;
+    float d;
 };
 
 vec p[500000];
 bool state = 0;
-double voxsize = 0.1;
+bool voxstate = 0;
+bool voxline = 0;
+double voxsize = 10;
+point barycenter;
+float Volume1=0,Volume2=0;
+static GLfloat yRot = 0.0f;         // Rotation angle for animation
+static GLfloat zRot = 0.0f;         // Rotation angle for animation
+point calVec(point a,point b)
+{
+    point ab;
+    ab.px = b.px - a.px;
+    ab.py = b.py - a.py;
+    ab.pz = b.pz - a.pz;
+    return ab;
+}
+void cross2Product(point a, point b,int index,point c)
+{
+    p[index].a = a.py*b.pz - a.pz*b.py;
+    p[index].b = a.pz*b.px - a.px*b.pz;
+    p[index].c = a.px*b.py - a.py*b.px;
+    p[index].d = p[index].a*c.px + p[index].b*c.py + p[index].c*c.pz;
+}
+float cross3Product(point a, point b, point c)
+{
+    float product;
+    product = abs(  a.px*b.py*c.pz + a.py*b.pz*c.px + a.pz*b.px*c.py
+                  - a.pz*b.py*c.px - a.py*b.px*c.pz - a.px*b.pz*c.py);
+    return product;
+}
+float Atriangle(vec tri)
+{
+    point pq,pr;
+    pq = calVec(tri.pp[0],tri.pp[1]);
+    pr = calVec(tri.pp[0],tri.pp[2]);
+    float area = sqrtf(pow(pq.py*pr.pz-pr.py*pq.pz,2)+pow(pq.pz*pr.px-pr.pz*pq.px,2)+pow(pq.px*pr.py-pr.px*pq.py,2))/2;
+    return area;
+}
+float Vtetrahedron(vec tri)
+{
+    point pq,pr,ps;
+    pq = calVec(barycenter,tri.pp[0]);
+    pr = calVec(barycenter,tri.pp[1]);
+    ps = calVec(barycenter,tri.pp[2]);
+    float volume = cross3Product(pq,pr,ps)/6;
+    return volume;
+}
+void calVoxvolume(int numVox)
+{
+    Volume2 = numVox * pow(voxsize,3);
+    //cout << volume << endl;
+}
 void read_binary_stl(string fname)
 {
     cout <<"This is binary stl file !" << endl;
@@ -118,13 +173,37 @@ void read_binary_stl(string fname)
 
         }
     }
-    /*for(int i = 0; i < int(nTriLong); i++){
-        cout << "facet" << i << "   p1:   " << p[i].p1.px << "," << p[i].p1.py << "," << p[i].p1.pz ;
-        cout << "   p2:   " << p[i].p2.px << "," << p[i].p2.py << "," << p[i].p2.pz ;
-        cout << "   p3:   " << p[i].p3.px << "," << p[i].p3.py << "," << p[i].p3.pz ;
-        cout << endl;
-    }*/
 
+    // initial volume to 1;
+    for(int i = 0; i < int(nTriLong); i++)
+    {
+        p[i].volume = 1;
+    }
+    //calculate inner point
+    for(int i = 0; i < int(nTriLong); i++)
+    {
+        for(int j = 0; j < 3; j++)
+        {
+            barycenter.px += p[i].pp[j].px;
+            barycenter.py += p[i].pp[j].py;
+            barycenter.pz += p[i].pp[j].pz;
+        }
+    }
+    barycenter.px /= float(int(nTriLong)*3);
+    barycenter.py /= float(int(nTriLong)*3);
+    barycenter.pz /= float(int(nTriLong)*3);
+    //calculate volume from barycenter to triangle
+    for(int i = 0; i < int(nTriLong); i++)
+    {
+        p[i].volume = Vtetrahedron(p[i]);
+    }
+    //calculate triangle function
+    for(int i = 0; i < int(nTriLong); i++)
+    {
+        point a = calVec(p[i].pp[0],p[i].pp[1]);
+        point b = calVec(p[i].pp[0],p[i].pp[2]);
+        cross2Product(a,b,i,p[i].pp[0]);
+    }
 }
 
 void read_ascii_stl(string fname)
@@ -242,281 +321,262 @@ void read_ascii_stl(string fname)
 
 
 }
-void drawvoxel(point p1,double vsize)
+
+void draw_cube(int x,int y,int z)
 {
-    glBegin(GL_QUADS);        // Draw The Cube Using quads
-            glColor3f(0.0f,0.0f,1.0f);    // Color Blue
-            glVertex3f(p1.px+vsize,p1.py+vsize,p1.pz-vsize);    // Top Right Of The Quad (Top)
-            glVertex3f(p1.px-vsize,p1.py+vsize,p1.pz-vsize);    // Top Left Of The Quad (Top)
-            glVertex3f(p1.px-vsize,p1.py+vsize,p1.pz+vsize);    // Bottom Left Of The Quad (Top)
-            glVertex3f(p1.px+vsize,p1.py+vsize,p1.pz+vsize);    // Bottom Right Of The Quad (Top)
-            //glColor3f(1.0f,0.5f,0.0f);    // Color Orange
-            glVertex3f(p1.px+vsize,p1.py-vsize,p1.pz+vsize);    // Top Right Of The Quad (Bottom)
-            glVertex3f(p1.px-vsize,p1.py-vsize,p1.pz+vsize);    // Top Left Of The Quad (Bottom)
-            glVertex3f(p1.px-vsize,p1.py-vsize,p1.pz-vsize);    // Bottom Left Of The Quad (Bottom)
-            glVertex3f(p1.px+vsize,p1.py-vsize,p1.pz-vsize);    // Bottom Right Of The Quad (Bottom)
-            //glColor3f(1.0f,0.0f,0.0f);    // Color Red
-            glVertex3f(p1.px+vsize,p1.py+vsize,p1.pz+vsize);    // Top Right Of The Quad (Front)
-            glVertex3f(p1.px-vsize,p1.py+vsize,p1.pz+vsize);    // Top Left Of The Quad (Front)
-            glVertex3f(p1.px-vsize,p1.py-vsize,p1.pz+vsize);    // Bottom Left Of The Quad (Front)
-            glVertex3f(p1.px+vsize,p1.py-vsize,p1.pz+vsize);    // Bottom Right Of The Quad (Front)
-            //glColor3f(1.0f,1.0f,0.0f);    // Color Yellow
-            glVertex3f(p1.px+vsize,p1.py-vsize,p1.pz-vsize);    // Top Right Of The Quad (Back)
-            glVertex3f(p1.px-vsize,p1.py-vsize,p1.pz-vsize);    // Top Left Of The Quad (Back)
-            glVertex3f(p1.px-vsize,p1.py+vsize,p1.pz-vsize);    // Bottom Left Of The Quad (Back)
-            glVertex3f(p1.px+vsize,p1.py+vsize,p1.pz-vsize);    // Bottom Right Of The Quad (Back)
-            //glColor3f(0.0f,0.0f,1.0f);    // Color Blue
-            glVertex3f(p1.px-vsize,p1.py+vsize,p1.pz+vsize);    // Top Right Of The Quad (Left)
-            glVertex3f(p1.px-vsize,p1.py+vsize,p1.pz-vsize);    // Top Left Of The Quad (Left)
-            glVertex3f(p1.px-vsize,p1.py-vsize,p1.pz-vsize);    // Bottom Left Of The Quad (Left)
-            glVertex3f(p1.px-vsize,p1.py-vsize,p1.pz+vsize);    // Bottom Right Of The Quad (Left)
-            //glColor3f(1.0f,0.0f,1.0f);    // Color Violet
-            glVertex3f(p1.px+vsize,p1.py+vsize,p1.pz-vsize);    // Top Right Of The Quad (Right)
-            glVertex3f(p1.px+vsize,p1.py+vsize,p1.pz+vsize);    // Top Left Of The Quad (Right)
-            glVertex3f(p1.px+vsize,p1.py-vsize,p1.pz+vsize);    // Bottom Left Of The Quad (Right)
-            glVertex3f(p1.px+vsize,p1.py-vsize,p1.pz-vsize);    // Bottom Right Of The Quad (Right)
-            glEnd();            // End Drawing The Cube - See more at: http://www.codemiles.com/c-opengl-examples/draw-3d-cube-using-opengl-t9018.html#sthash.FDVsWoyj.dpuf
+    float v = voxsize/2;
+    glPushMatrix();
+    glColor3f(1,0,0);
+    glBegin(GL_POLYGON);
+    glVertex3f(x+v, y+v, z+v);  glVertex3f(x-v, y+v, z+v); glVertex3f(x-v, y-v, z+v); glVertex3f(x+v, y-v, z+v);
+    glEnd();
+
+    glBegin(GL_POLYGON);
+    glVertex3f(x+v, y+v, z+v);  glVertex3f(x+v, y+v, z-v); glVertex3f(x+v, y-v, z-v); glVertex3f(x+v, y-v, z+v);
+    glEnd();
+
+    glBegin(GL_POLYGON);
+    glVertex3f(x+v, y+v, z+v);  glVertex3f(x+v, y+v, z-v); glVertex3f(x-v, y+v, z-v); glVertex3f(x-v, y+v, z+v);
+    glEnd();
+
+    glBegin(GL_POLYGON);
+    glVertex3f(x-v, y+v, z+v);  glVertex3f(x-v, y+v, z-v); glVertex3f(x-v, y-v, z-v); glVertex3f(x-v, y-v, z+v);
+    glEnd();
+
+    glBegin(GL_POLYGON);
+    glVertex3f(x+v, y-v, z+v);  glVertex3f(x-v, y-v, z+v); glVertex3f(x-v, y-v, z-v); glVertex3f(x+v, y-v, z-v);
+    glEnd();
+
+    glBegin(GL_POLYGON);
+    glVertex3f(x+v, y+v, z-v);  glVertex3f(x-v, y+v, z-v); glVertex3f(x-v, y-v, z-v); glVertex3f(x+v, y-v, z-v);
+    glEnd();
+    glPopMatrix();
 
 }
-void Bresenham(int x0,int y0,int z0,int x1,int y1,int z1)
+void calVolrate(float v1,float v2)
 {
-    if((z1-z0)==0)
-    {
-        bool steep = abs(y1-y0) > abs(x1-x0);
-        if(steep)
-        {
-            swap(x0,y0);
-            swap(x1,y1);
-        }
-        if(x0>x1)
-        {
-            swap(x0,x1);
-            swap(y0,y1);
-        }
-        int deltax = x1-x0;
-        int deltay = abs(y1-y0);
-        float error = 0;
-        float deltaerr = deltay/deltax;
-        int ystep;
-        int y = y0;
-        if(y0<y1)ystep = 1;
-        else ystep = -1;
-        point temp;
-        temp.pz = z0;
-        for(int i=x0; i<=x1; i++)
-        {
-            if(steep)
-            {
-                temp.px = y;
-                temp.py = i;
-            }
-            else
-            {
-                temp.px = i;
-                temp.py = y;
-            }
-            error += deltaerr;
-            if(error >= 0.5)
-            {
-                y += ystep;
-                error -= 1.0;
-            }
-            drawvoxel(temp,0.5);
-        }
-    }
-    else if((x1-x0)==0)
-    {
-        bool steep = abs(z1-z0) > abs(y1-y0);
-        if(steep)
-        {
-            swap(y0,z0);
-            swap(y1,z1);
-        }
-        if(y0>y1)
-        {
-            swap(y0,y1);
-            swap(z0,z1);
-        }
-        int deltay = y1-y0;
-        int deltaz = abs(z1-z0);
-        float error = 0;
-        float deltaerr = deltaz/deltay;
-        int zstep;
-        int z = z0;
-        if(z0<z1)zstep = 1;
-        else zstep = -1;
-        point temp;
-        temp.px = x0;
-        for(int i=y0; i<=y1; i++)
-        {
-            if(steep)
-            {
-                temp.py = z;
-                temp.pz = i;
-            }
-            else
-            {
-                temp.py = i;
-                temp.pz = z;
-            }
-            error += deltaerr;
-            if(error >= 0.5)
-            {
-                z += zstep;
-                error -= 1.0;
-            }
-            drawvoxel(temp,0.5);
-        }
-    }
-    /*else if((y1-y0)==0)
-    {
-        bool steep = abs(z1-z0) > abs(x1-x0);
-        if(steep)
-        {
-            swap(x0,z0);
-            swap(x1,z1);
-        }
-        if(x0>x1)
-        {
-            swap(x0,x1);
-            swap(z0,z1);
-        }
-        int deltax = x1-x0;
-        int deltaz = abs(z1-z0);
-        float error = 0;
-        float deltaerr = deltaz/deltax;
-        int zstep;
-        int z = z0;
-        if(z0<z1)zstep = 1;
-        else zstep = -1;
-        point temp;
-        temp.py = y0;
-        for(int i=x0; i<=x1; i++)
-        {
-            if(steep)
-            {
-                temp.px = z;
-                temp.pz = i;
-            }
-            else
-            {
-                temp.px = i;
-                temp.pz = z;
-            }
-            error += deltaerr;
-            if(error >= 0.5)
-            {
-                z += zstep;
-                error -= 1.0;
-            }
-            drawvoxel(temp,0.5);
-        }
-    }*/
+    float rate = abs(v1-v2)/v1;
+    int ratioV = int(rate*100);
+    cout << "Volume similarity:" << ratioV << "%" << endl;
 }
-void voxelize(void)
+int find_in(int xp,int yp,int zp, int zn)
 {
+    int start=-1,ending=-1;
+    int d,f;
+    point project;
     for(int i = 0; i < int(nTriLong); i++)
     {
-
-        point v21,v31,v32;
-        v21.px = p[i].pp[1].px-p[i].pp[0].px;
-        v21.py = p[i].pp[1].py-p[i].pp[0].py;
-        v21.pz = p[i].pp[1].pz-p[i].pp[0].pz;
-
-        v31.px = p[i].pp[2].px-p[i].pp[0].px;
-        v31.py = p[i].pp[2].py-p[i].pp[0].py;
-        v31.pz = p[i].pp[2].pz-p[i].pp[0].pz;
-
-        v32.px = p[i].pp[2].px-p[i].pp[1].px;
-        v32.py = p[i].pp[2].py-p[i].pp[1].py;
-        v32.pz = p[i].pp[2].pz-p[i].pp[1].pz;
-
-
-        for(int j=0; j<3; j++)
+        for(int k=0; k<1; k++)
         {
-            if(j==2)Bresenham(p[i].pp[j].px,p[i].pp[j].py,p[i].pp[j].pz,p[i].pp[0].px,p[i].pp[0].py,p[i].pp[0].pz);
-            else Bresenham(p[i].pp[j].px,p[i].pp[j].py,p[i].pp[j].pz,p[i].pp[j+1].px,p[i].pp[j+1].py,p[i].pp[j+1].pz);
-        }
+            d = abs(p[i].a*xp + p[i].b*yp + p[i].c*(zp+k*voxsize) + p[i].d)
+                /sqrtf(pow(p[i].a,2)+pow(p[i].b,2)+pow(p[i].c,2));
 
-        /*cout << v21.px << "," << v21.py << "," << v21.pz << endl;
-        cout << v31.px << "," << v31.py << "," << v31.pz << endl;
-        cout << v32.px << "," << v32.py << "," << v32.pz << endl;*/
+            f = (p[i].a*xp + p[i].b*yp + p[i].c*(zp+k*voxsize) + p[i].d)
+                /(pow(p[i].a,2)+pow(p[i].b,2)+pow(p[i].c,2));
+
+            project.px = xp + f*p[i].a;
+            project.py = yp + f*p[i].b;
+            project.pz = (zp + k*voxsize) + f*p[i].c;
+
+            if((d<(sqrtf(3)*voxsize/2))
+               &&(project.px>(xp-voxsize/2))
+               &&(project.px<(xp+voxsize/2))
+               &&(project.py>(yp-voxsize/2))
+               &&(project.py<(yp+voxsize/2)))
+            {
+                if(start<0)start = k;
+                else
+                {
+                    ending = k;
+                    break;
+                }
+            }
+        }
     }
 
+    int temp;
+    if(start > ending)
+    {
+        if(ending!=-1)
+        {
+            temp = ending;
+            ending = start;
+            start = temp;
+        }
+    }
 
+    if((start==-1)&&(ending!=-1))
+    {
+        if(ending!=-1)
+        {
+            temp = ending;
+            ending = start;
+            start = temp;
+        }
+    }
 
+    //cout << start << "," << ending << endl;
+    //draw cube
 
+        if(start > ending)
+        {
+            for(int i=start; i<zn; i++)
+            {
+                draw_cube(xp,yp,zp+i*voxsize);
+            }
+            return zn - start;
+        }
+    else if((start==-1)&&(ending==-1))
+    {
+    }
+    else
+    {
+        for(int i=start; i<=ending; i++)
+        {
+            draw_cube(xp,yp,zp+i*voxsize);
+        }
+        return ending - start +1;
+    }
 
-    /*for(int i = 0; i < int(nTriLong); i++)
+}
+void line(int x,int y, int z)
+{
+    float v = voxsize/2;
+    glBegin(GL_LINES);  glVertex3f(x+v, y+v, z+v);  glVertex3f(x-v, y+v, z+v);  glEnd();
+    glBegin(GL_LINES);  glVertex3f(x-v, y+v, z+v);  glVertex3f(x-v, y-v, z+v);  glEnd();
+    glBegin(GL_LINES);  glVertex3f(x-v, y-v, z+v);  glVertex3f(x+v, y-v, z+v);  glEnd();
+    glBegin(GL_LINES);  glVertex3f(x+v, y-v, z+v);  glVertex3f(x+v, y+v, z+v);  glEnd();
+
+    glBegin(GL_LINES);  glVertex3f(x+v, y+v, z+v);  glVertex3f(x+v, y+v, z-v);  glEnd();
+    glBegin(GL_LINES);  glVertex3f(x-v, y+v, z+v);  glVertex3f(x-v, y+v, z-v);  glEnd();
+    glBegin(GL_LINES);  glVertex3f(x+v, y-v, z+v);  glVertex3f(x+v, y-v, z-v);  glEnd();
+    glBegin(GL_LINES);  glVertex3f(x-v, y-v, z+v);  glVertex3f(x-v, y-v, z-v);  glEnd();
+
+    glBegin(GL_LINES);  glVertex3f(x+v, y+v, z-v);  glVertex3f(x-v, y+v, z-v);  glEnd();
+    glBegin(GL_LINES);  glVertex3f(x-v, y+v, z-v);  glVertex3f(x-v, y-v, z-v);  glEnd();
+    glBegin(GL_LINES);  glVertex3f(x-v, y-v, z-v);  glVertex3f(x+v, y-v, z-v);  glEnd();
+    glBegin(GL_LINES);  glVertex3f(x+v, y-v, z-v);  glVertex3f(x+v, y+v, z-v);  glEnd();
+}
+void drawvoxel(float xMax, float yMax, float zMax, float xMin, float yMin, float zMin)
+{
+    int x0=int(xMin),y0=int(yMin),z0=int(zMin);
+    //cout << x0 << "," << y0 << "," << z0 << endl;
+    int xn=int((xMax-x0)/voxsize)+1,yn=int((yMax-y0)/voxsize)+1,zn=int((zMax-z0)/voxsize)+1;
+    //cout << xn << "," << yn << "," << zn << endl;
+    int xp = x0 + voxsize/2, yp = y0 + voxsize/2, zp = z0 + voxsize/2;
+    int count =0;
+    //cout << xn*yn*zn << endl;
+    //draw all voxel line
+    for(int i=0; i<xn; i++)
+    {
+        for(int j=0; j<yn; j++)
+        {
+            for(int k=0; k<zn; k++)
+            {
+                line(xp+i*voxsize,yp+j*voxsize,zp+k*voxsize);
+                //draw_cube(xp+i*voxsize,yp+j*voxsize,zp+k*voxsize);
+            }
+        }
+    }
+    //draw voxel
+    if(voxstate)
+    {
+        for(int i=0; i<xn; i++)
+        {
+            for(int j=0; j<yn; j++)
+            {
+                count += find_in(xp+i*voxsize,yp+j*voxsize,zp,zn);
+            }
+        }
+    }
+    calVoxvolume(count);
+}
+
+void voxelize(void)
+{
+    float xMax=0,yMax=0,zMax=0,xMin=100,yMin=100,zMin=100;
+    for(int i = 0; i < int(nTriLong); i++)
     {
         for(int j = 0; j < 3; j++)
         {
-            drawvoxel(p[i].pp[j],voxsize);
+            if(p[i].pp[j].px > xMax)xMax = p[i].pp[j].px;
+            if(p[i].pp[j].py > yMax)yMax = p[i].pp[j].py;
+            if(p[i].pp[j].pz > zMax)zMax = p[i].pp[j].pz;
+            if(p[i].pp[j].px < xMin)xMin = p[i].pp[j].px;
+            if(p[i].pp[j].py < yMin)yMin = p[i].pp[j].py;
+            if(p[i].pp[j].pz < zMin)zMin = p[i].pp[j].pz;
         }
-    }*/
+    }
+    for(int i = 0; i < int(nTriLong); i++)Volume1 += p[i].volume;
+    if(voxline)drawvoxel(xMax,yMax,zMax,xMin,yMin,zMin);
 }
 point cenPoint(vec p[])
 {
+    float Tweight = 0;
     point avg,cenP;
     cenP.px = 0;
     cenP.py = 0;
     cenP.pz = 0;
     for(int i = 0; i < int(nTriLong); i++)
     {
-        avg.px = 0;
-        avg.py = 0;
-        avg.pz = 0;
+        avg.px = barycenter.px;
+        avg.py = barycenter.py;
+        avg.pz = barycenter.pz;
         for(int j = 0; j < 3; j++)
         {
             avg.px += p[i].pp[j].px;
             avg.py += p[i].pp[j].py;
             avg.pz += p[i].pp[j].pz;
         }
-        cenP.px += avg.px/3;
-        cenP.py += avg.py/3;
-        cenP.pz += avg.pz/3;
+        cenP.px += p[i].volume*avg.px/4;
+        cenP.py += p[i].volume*avg.py/4;
+        cenP.pz += p[i].volume*avg.pz/4;
+        Tweight += p[i].volume;
     }
-    cenP.px /= int(nTriLong);
-    cenP.py /= int(nTriLong);
-    cenP.pz /= int(nTriLong);
+    cenP.px /= Tweight;
+    cenP.py /= Tweight;
+    cenP.pz /= Tweight;
     return cenP;
 }
 
-float minZ(vec p[])
-{
-    float minZ = 100;
-    for(int i = 0; i < int(nTriLong); i++)
-    {
-        for(int j = 0; j < 3; j++)
-        {
-            if(p[i].pp[j].pz < minZ)minZ = p[i].pp[j].pz;
-        }
-    }
-    return minZ;
-}
 point firstcenP(vec p[])
 {
-    int count = 0;
-    point fcp;
-    fcp.px = 0;
-    fcp.py = 0;
-    fcp.pz = 0;
+    float Tweight = 0;
+    point avg,cenP,fcp;
+    cenP.px = 0;
+    cenP.py = 0;
+    cenP.pz = 0;
+    float area;
+    float minz = 100;
     for(int i = 0; i < int(nTriLong); i++)
     {
         for(int j = 0; j < 3; j++)
         {
-            if(p[i].pp[j].pz == minZ(p))
-            {
-                fcp.px += p[i].pp[j].px;
-                fcp.py += p[i].pp[j].py;
-                count++;
-            }
+            if(p[i].pp[j].pz < minz)minz = p[i].pp[j].pz;
         }
     }
-    fcp.px /= count;
-    fcp.py /= count;
-    fcp.pz = minZ(p);
-    cout << count << endl;
+
+    for(int i = 0; i < int(nTriLong); i++)
+    {
+        avg.px = 0;
+        avg.py = 0;
+        avg.pz = 0;
+        area = 0;
+        if(abs(minz*3-p[i].pp[0].pz-p[i].pp[1].pz-p[i].pp[2].pz)<3)
+        {
+            avg.px = (p[i].pp[0].px+p[i].pp[1].px+p[i].pp[2].px)/3;
+            avg.py = (p[i].pp[0].py+p[i].pp[1].py+p[i].pp[2].py)/3;
+            avg.pz = (p[i].pp[0].pz+p[i].pp[1].pz+p[i].pp[2].pz)/3;
+            area = Atriangle(p[i]);
+            cenP.px += avg.px*area;
+            cenP.py += avg.py*area;
+            cenP.pz += avg.pz*area;
+            Tweight += area;
+        }
+    }
+    fcp.px = cenP.px/Tweight;
+    fcp.py = cenP.py/Tweight;
+    fcp.pz = cenP.pz/Tweight;
     return fcp;
 }
 void drawCenPoint(point pc)
@@ -525,17 +585,25 @@ void drawCenPoint(point pc)
     glPushMatrix();
     glColor3f(1,0,0);
     GLUquadric *quad = gluNewQuadric();
-    glTranslatef(pc.px,pc.py,minZ(p));
+    glTranslatef(pc.px,pc.py,pc.pz);
     gluSphere(quad,1,100,20);
     glPopMatrix();
 
     glPushMatrix();
     glColor3f(1,1,0);
     GLUquadric *quad1 = gluNewQuadric();
-    glTranslatef(firstcenP(p).px,firstcenP(p).py,firstcenP(p).pz);
+    point pp = firstcenP(p);
+    glTranslatef(pp.px,pp.py,pp.pz);
     gluSphere(quad1,1,100,20);
     glPopMatrix();
 
+    glPushMatrix();
+    glColor3f(1,0,1);
+    glBegin(GL_LINES);
+    glVertex3f(pc.px,pc.py,pc.pz);
+    glVertex3f(pp.px,pp.py,pp.pz);
+    glEnd();
+    glPopMatrix();
 }
 void DrawModel()
 {
@@ -543,6 +611,7 @@ void DrawModel()
     glTranslatef(0.0f, -0.5f, 0.0f);
     glRotatef(-90, 1.0f, 0.0f, 0.0f);
     glScaled (0.01, 0.01, 0.01);
+    glColor3f(0.5f,0.5f,0.5f);
     if(!state)
     {
 
@@ -553,6 +622,7 @@ void DrawModel()
                 glVertex3f(p[i].pp[j].px, p[i].pp[j].py, p[i].pp[j].pz);
             glEnd();
         }
+        voxelize();
 
     }
     else
@@ -658,32 +728,31 @@ void DrawGround(void)
 // Draw random inhabitants and the rotating torus/sphere duo
 void DrawInhabitants(GLint nShadow)
 {
-    static GLfloat yRot = 0.0f;         // Rotation angle for animation
 
 
-    if(nShadow == 0)
+
+    /*if(nShadow == 0)
         yRot += 0.05f;
     else
-        glColor3f(0.0f, 0.0f, 0.0f);
+        glColor3f(0.0f, 0.0f, 0.0f);*/
 
     glPushMatrix();
     glTranslatef(0.0f, 0.1f, -2.5f);
 
-    if(nShadow == 0)
+    /*if(nShadow == 0)
     {
         // Torus alone will be specular
         glColor3f(1.0f, 0.0f, 1.0f);
         glMaterialfv(GL_FRONT, GL_SPECULAR, fBrightLight);
-    }
+    }*/
 
-    //glRotatef(yRot, 0.0f, 1.0f, 0.0f);
+    glRotatef(yRot, 0.0f, 1.0f, 0.0f);
+    glRotatef(zRot, 0.0f, 0.0f, 1.0f);
     DrawModel();
 
     glMaterialfv(GL_FRONT, GL_SPECULAR, fNoLight);
     glPopMatrix();
 }
-
-
 // Called to draw scene
 void RenderScene(void)
 {
@@ -704,7 +773,7 @@ void RenderScene(void)
     glDisable(GL_DEPTH_TEST);
     glDisable(GL_LIGHTING);
     glPushMatrix();
-    glMultMatrixf(mShadowMatrix);
+    //glMultMatrixf(mShadowMatrix);
     DrawInhabitants(1);
     glPopMatrix();
     glEnable(GL_LIGHTING);
@@ -748,8 +817,26 @@ void KeyboardFunc(unsigned char key, int x, int y)
         if(state)state = 0;
         else state = 1;
     }
-    if(key == 'a')voxsize+=0.1;
-    if(key == 's')voxsize-=0.1;
+    if(key == 'a')voxsize+=0.5;
+    if(key == 's')voxsize-=0.5;
+    if(key == 'x')
+    {
+        if(voxline)voxline = 0;
+        else voxline = 1;
+    }
+    if(key == 'c')
+    {
+        if(voxstate)voxstate = 0;
+        else
+        {
+            voxstate = 1;
+            calVolrate(Volume1,Volume2);
+        }
+    }
+    if(key == 'j')yRot+=5;
+    if(key == 'l')yRot-=5;
+    if(key == 'i')zRot+=5;
+    if(key == 'k')zRot-=5;
     // Refresh the Window
     glutPostRedisplay();
 }
